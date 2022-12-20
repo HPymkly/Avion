@@ -23,9 +23,9 @@ public class Kilometrage {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     Integer id;
 
-    @JsonIgnore
     @ManyToOne
     @JoinColumn(name = "vehiculeid", nullable = false, updatable = false)
+    @JsonIgnore
     Vehicule vehicule;
 
     Date date;
@@ -33,4 +33,14 @@ public class Kilometrage {
     double debut;
 
     double fin;
+
+    @Override
+    public String toString() {
+        return "Kilometrage [id=" + id + ", date=" + date + ", debut=" + debut + ", fin=" + fin + "]";
+    }
+
+    public Kilometrage() {
+        this.vehicule = null;
+    }
+
 }

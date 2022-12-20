@@ -10,10 +10,6 @@ import javax.persistence.OneToMany;
 import javax.persistence.OneToOne;
 import javax.persistence.JoinColumn;
 
-
-
-import com.fasterxml.jackson.annotation.JsonIgnore;
-
 import extract.vehicule.assurance.Assurvehicule;
 import extract.vehicule.kilometrage.Kilometrage;
 import lombok.Data;
@@ -33,4 +29,12 @@ public class Vehicule {
     @OneToOne
     @JoinColumn(name = "id", nullable = false, updatable = false)
     Assurvehicule assurvehicule;
+
+    String img;
+
+    public void prepare() {
+        for (int i = 0; i < this.getKilometrage().size(); i++) {
+            this.getKilometrage().get(i).setVehicule(null);
+        }
+    }
 }

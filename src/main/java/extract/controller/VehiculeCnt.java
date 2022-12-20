@@ -9,7 +9,10 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
+
+import extract.auth.NoAuth;
 import extract.vehicule.Vehicule;
 import extract.vehicule.VehiculeSer;
 import lombok.Data;
@@ -22,48 +25,70 @@ public class VehiculeCnt extends Cnt {
     @Autowired
     VehiculeSer vehiculeSer;
 
-    @PutMapping("/vehicule/{id}")
+    public String toAns(Object o) {
+        Success s = new Success();
+        s.setData(o);
+        return this.getGson().toJson(s);
+    }
+
+    public String toErr(Exception e) {
+        Error err = new Error();
+        err.code = 500;
+        err.setMessage(e.getMessage());
+        return this.getGson().toJson(err);
+    }
+
+    @PutMapping("/voiture/{id}")
     public String update(@PathVariable String id, @RequestBody Vehicule v) {
         try {
             v.setId(Integer.parseInt(id));
             this.getVehiculeSer().create(v);
-            return this.getGson().toJson(v);
+            return this.toAns(v);
         } catch (Exception e) {
             e.printStackTrace();
-            return e.getMessage();
+            return this.toErr(e);
         }
     }
 
-    @DeleteMapping("/vehicule/{id}")
+    @DeleteMapping("/voiture/{id}")
     public String delete(@PathVariable String id) {
         try {
             this.getVehiculeSer().delete(Integer.parseInt(id));
             return "ok";
         } catch (Exception e) {
-            return e.getMessage();
+            return this.toErr(e);
         }
     }
 
-    @GetMapping("/vehicule/{id}")
-    public String getOne(@PathVariable String id) {
+    @GetMapping("/voiture/{id}")
+    public String getOne(@PathVariable String id, @RequestParam("idUser") String idU) {
         try {
-            Vehicule v = this.getVehiculeSer().getById(Integer.parseInt(id));
+            Vehicule v = this.getVehiculeSer().getById(Integer.parseInt(id), idU);
             return this.getGson().toJson(v);
         } catch (Exception e) {
-            return e.getMessage();
+            return this.toErr(e);
         }
-
     }
 
-    @GetMapping("/vehicule")
+    @GetMapping("/voiture")
     public String getAll() {
         List<Vehicule> ans = this.getVehiculeSer().list();
-        return this.getGson().toJson(ans);
+        return this.toAns(ans);
     }
 
-    @PostMapping("/vehicule")
+    @GetMapping("/voiture/mois/{mois}")
+    public String getByAssurance(@PathVariable String mois, @RequestParam("idUser") String idU) {
+        try {
+            List<Vehicule> ans = this.getVehiculeSer().getByAssur(Integer.parseInt(mois), idU);
+            return this.toAns(ans);
+        } catch (NumberFormatException | NoAuth e) {
+            return this.toErr(e);
+        }
+    }
+
+    @PostMapping("/voiture")
     public String create(@RequestBody Vehicule vehicule) {
         this.getVehiculeSer().create(vehicule);
-        return "ok";
+        return this.toAns("ok");
     }
 }

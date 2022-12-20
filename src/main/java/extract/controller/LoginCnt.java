@@ -25,7 +25,9 @@ public class LoginCnt extends Cnt {
     public String login(@RequestBody Login login) {
         try {
             Token l = this.getLoginSer().login(login);
-            return this.getGson().toJson(l);
+            Success s = new Success();
+            s.setData(l);
+            return this.getGson().toJson(s);
         } catch (NoLogin e) {
             e.printStackTrace();
             return e.getMessage();
@@ -45,6 +47,8 @@ public class LoginCnt extends Cnt {
             e.printStackTrace();
             ans = e.getMessage();
         }
-        return ans;
+        Success s = new Success();
+        s.setData(ans);
+        return this.getGson().toJson(s);
     }
 }
